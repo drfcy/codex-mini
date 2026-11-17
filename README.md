@@ -1,12 +1,128 @@
+[English](#english) | [简体中文](#简体中文)
+
 <p align="center">
-  <img src="Resources/AppIcon.png" width="128" alt="Codex Mini 图标">
+  <img src="Resources/AppIcon.png" width="128" alt="Codex Mini icon">
 </p>
+
+<a id="english"></a>
 
 # Codex Mini
 
-一个简单的 macOS 菜单栏工具：看一眼，就知道 Codex 还剩多少额度、多久重置。
+A minimal native macOS menu bar app that shows your remaining Codex quota and the time until it resets.
 
-A minimal native macOS menu bar app for Codex quota and reset countdowns.
+**[Download for Apple Silicon](https://github.com/drfcy/codex-mini/releases/latest)** · [Usage](#usage) · [Build from source](#build-from-source)
+
+<p align="center">
+  <img src="docs/menubar-preview.svg" width="600" alt="Menu bar preview: 5h 97% 4h 51m">
+</p>
+<p align="center"><sub>Illustration with sample data. The percentage shows your remaining quota.</sub></p>
+
+## Features
+
+- Shows the remaining percentage of your short-term quota and a reset countdown in the menu bar.
+- Open the menu to view your weekly quota and reset times.
+- Refreshes quota every minute and updates the countdown every 15 seconds.
+- Offers Chinese and English time formats and remembers your choice.
+- Supports manual refresh and launch at login; launch at login is off by default.
+- Automatically tries the local Codex client if the direct connection fails.
+- Built with Swift and AppKit, with no third-party code dependencies and no Dock icon.
+
+## Download and installation
+
+Requires **macOS 14 or later, an Apple Silicon (M-series) Mac**, and an existing ChatGPT account sign-in in Codex.
+
+1. Download `Codex-Mini-v1.0.2-macOS-arm64.zip` from [Releases](https://github.com/drfcy/codex-mini/releases/latest).
+2. Extract the ZIP and drag `Codex Mini.app` into Applications.
+3. Open the app. Your quota and reset countdown will appear in the menu bar.
+
+The current release is ad-hoc signed. It is not signed with an Apple Developer ID or notarized by Apple, so macOS may block it on first launch. After checking the download source and SHA-256 checksum, follow [Apple's instructions](https://support.apple.com/zh-cn/guide/mac-help/mh40616/mac) for Privacy & Security, or build the app from source.
+
+To update, quit the old version from its menu before replacing the app in Applications. Avoid running multiple copies at the same time.
+
+## Usage
+
+`5h 97%` means that 97% of your five-hour quota remains. The time shown is the countdown until that quota resets.
+
+| Time format | Example |
+| --- | --- |
+| 中文 | `5h 97% 4小时51分钟` |
+| English | `5h 97% 4h 51m` |
+
+Click the menu bar icon and choose a format under **时间语言** (Time language). Neither format adds a prefix or suffix such as “in” or “后”. Other menu labels are currently in Chinese.
+
+The menu also includes **立即刷新** (Refresh now), **开机启动** (Launch at login), and **退出 Codex Mini** (Quit Codex Mini). There is no main window. After quitting, reopen the app from Applications.
+
+`⚠︎` means the latest refresh failed or the data has not been updated for more than two and a half minutes. The menu shows the error and the last successful update time; any retained quota is the last successful reading. Once its reset time has passed, the old percentage becomes `--%` until fresh server data is available.
+
+## Data and privacy
+
+- Reuses the existing sign-in in `~/.codex/auth.json`, or the directory specified by `CODEX_HOME`.
+- Requests usage from `https://chatgpt.com/backend-api/wham/usage` and does not save a separate copy of your login tokens.
+- If the direct HTTP request encounters a connection error, it falls back to the local Codex client's `account/rateLimits/read` method. The child process is closed afterward; it does not create chats or run model tasks.
+- The fallback client inherits the current proxy environment. If the relevant variables are absent, it uses the system's static HTTP/HTTPS proxy settings for that child process without changing system network settings.
+- Codex Mini does not write to the login file. The Codex client may renew its own sign-in according to its normal behavior.
+- Does not read browser cookies, Keychain items, or chat content. No telemetry, ads, or automatic updates.
+
+The app depends on Codex's existing usage data format. Server-side changes may affect quota retrieval. This is an independent open-source tool and is not affiliated with OpenAI.
+
+## Build from source
+
+Requires macOS, Xcode or compatible Command Line Tools, and Swift 6. No third-party dependencies are needed.
+
+```sh
+git clone https://github.com/drfcy/codex-mini.git
+cd codex-mini
+./build.sh
+```
+
+The app is generated at `.build/Codex Mini.app`. Copy it into Applications before running it. The build targets macOS 14+ / arm64.
+
+To choose another output directory:
+
+```sh
+./build.sh "/your/output/directory/Codex Mini.app"
+```
+
+Run the offline parsing and formatting tests:
+
+```sh
+./Scripts/test.sh
+```
+
+To verify live quota retrieval yourself (uses your current Codex sign-in and prints only quota and time):
+
+```sh
+xcrun swiftc -swift-version 6 Sources/Usage.swift Tests/LiveCheck.swift -o .build/live-check
+.build/live-check
+.build/live-check --test-fallback
+```
+
+`--test-fallback` simulates a TLS error on the direct connection and then checks the real Codex client fallback. CI does not run tests that require a real account.
+
+## Icon not updating
+
+If LaunchOS or another launcher still shows an old or placeholder icon, fully quit and reopen the launcher. If the problem persists, refresh only this app's system registration, then reopen the launcher:
+
+```sh
+touch "/Applications/Codex Mini.app"
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "/Applications/Codex Mini.app"
+```
+
+Keep old-version backups as ZIP archives to avoid registering multiple `.app` copies.
+
+## Acknowledgments and license
+
+The usage endpoint, response format, and fallback approach were informed by [CodexBar](https://github.com/steipete/CodexBar). This project independently implements a minimal menu bar interface with original ring-and-clock SVG icons.
+
+Licensed under the [MIT License](LICENSE). See [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) for the reference project's license.
+
+---
+
+<a id="简体中文"></a>
+
+# Codex Mini · 简体中文
+
+一个简单的 macOS 菜单栏工具：看一眼，就知道 Codex 还剩多少额度、多久重置。
 
 **[下载 Apple Silicon 版](https://github.com/drfcy/codex-mini/releases/latest)** · [使用说明](#使用) · [从源码构建](#从源码构建)
 
