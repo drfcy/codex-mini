@@ -1,0 +1,23 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Show Swift version
+        run: swift --version
+      - name: Test quota parsing and formatting
+        run: ./Scripts/test.sh
+      - name: Build application
+        run: ./build.sh
+      - name: Verify application signature
+        run: codesign --verify --deep --strict --verbose=2 ".build/Codex Mini.app"

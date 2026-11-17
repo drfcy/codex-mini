@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="100" viewBox="0 0 780 100">
+  <rect width="780" height="100" rx="20" fill="#26343b"/>
+  <g transform="translate(33 24) scale(2.16)" fill="none" stroke="#f5f7fa" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 12 A8 8 0 1 1 12 4" stroke-width="2.2"/>
+    <path d="M12 8 V12 L15.3 14" stroke-width="2"/>
+  </g>
+  <text x="107" y="66" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="42" font-weight="600" fill="#f5f7fa">5h 97% 4h 51m</text>
+</svg>
